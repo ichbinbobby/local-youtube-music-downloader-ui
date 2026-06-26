@@ -50,8 +50,8 @@ async function fetchInfo() {
     const data = await $fetch<VideoInfo>('/api/info', { query: { url: trimmed } })
     info.value = data
   }
-  catch (err: any) {
-    infoError.value = err.data?.message ?? err.message ?? 'Failed to fetch info'
+  catch (err: unknown) {
+    infoError.value = errorMessage(err, 'Failed to fetch info')
   }
   finally {
     isLoadingInfo.value = false
@@ -97,8 +97,8 @@ async function startDownload() {
       es.close()
     }
   }
-  catch (err: any) {
-    progressLines.value.push(`Error: ${err.data?.message ?? err.message ?? 'Download failed'}`)
+  catch (err: unknown) {
+    progressLines.value.push(`Error: ${errorMessage(err, 'Download failed')}`)
     downloadStatus.value = 'error'
     isDownloading.value = false
   }
@@ -110,6 +110,17 @@ function reset() {
   infoError.value = ''
   downloadStatus.value = 'idle'
   progressLines.value = []
+}
+
+function errorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object') {
+    const e = err as Record<string, unknown>
+    if (typeof e.data === 'object' && e.data && typeof (e.data as Record<string, unknown>).message === 'string') {
+      return (e.data as Record<string, unknown>).message as string
+    }
+    if (typeof e.message === 'string') return e.message
+  }
+  return fallback
 }
 
 const isPlaylist = computed(() => info.value?._type === 'playlist')
