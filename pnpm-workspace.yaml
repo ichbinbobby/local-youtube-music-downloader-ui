@@ -4,3 +4,5 @@ allowBuilds:
   esbuild: false
   unrs-resolver: false
   vue-demi: false
+minimumReleaseAgeExclude:
+  - '@iconify-json/simple-icons@1.2.91'
