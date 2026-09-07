@@ -5,4 +5,7 @@ allowBuilds:
   unrs-resolver: false
   vue-demi: false
 minimumReleaseAgeExclude:
-  - '@iconify-json/simple-icons@1.2.91'
+  - '@iconify-json/simple-icons@1.2.91 || 1.2.95'
+  - '@iconify-json/lucide@1.2.130'
+  - '@nuxt/ui@4.11.1'
+  - '@types/node@26.5.0'
