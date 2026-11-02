@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process'
+import { getYtDlpExecutable, getYtDlpSpawnError } from '../utils/jobs'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -9,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   return new Promise((resolve, reject) => {
-    const ytdlp = spawn('yt-dlp', [
+    const ytdlp = spawn(getYtDlpExecutable(), [
       '--dump-single-json',
       '--flat-playlist',
       '--no-warnings',
@@ -39,8 +40,8 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    ytdlp.on('error', (err: Error) => {
-      reject(createError({ statusCode: 500, message: `Failed to run yt-dlp: ${err.message}` }))
+    ytdlp.on('error', (err: NodeJS.ErrnoException) => {
+      reject(createError({ statusCode: 500, message: getYtDlpSpawnError(err) }))
     })
   })
 })

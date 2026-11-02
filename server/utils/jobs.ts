@@ -1,3 +1,16 @@
+export function getYtDlpExecutable(): string {
+  const config = useRuntimeConfig()
+  return config.ytDlpPath || 'yt-dlp'
+}
+
+export function getYtDlpSpawnError(err: NodeJS.ErrnoException): string {
+  if (err.code === 'ENOENT') {
+    return 'yt-dlp was not found. Install it and make sure it is on PATH, then restart the app. Alternatively, set NUXT_YT_DLP_PATH to the full path to the executable.'
+  }
+
+  return `Failed to run yt-dlp: ${err.message}`
+}
+
 export interface Job {
   status: 'running' | 'done' | 'error'
   lines: string[]

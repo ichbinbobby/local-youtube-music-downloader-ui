@@ -154,7 +154,7 @@ const artistName = computed(() => info.value?.artist ?? info.value?.uploader ?? 
         <UFormField label="Output folder">
           <UInput
             v-model="outputPath"
-            placeholder="Leave empty to use ~/Music"
+            placeholder="Leave empty to use ~/Downloads"
             class="w-full font-mono text-sm"
           />
         </UFormField>

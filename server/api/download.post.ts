@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
-import { createJob, pushLine, finishJob } from '../utils/jobs'
+import { createJob, pushLine, finishJob, getYtDlpExecutable, getYtDlpSpawnError } from '../utils/jobs'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const isPlaylist = body?.isPlaylist as boolean | undefined
 
   const config = useRuntimeConfig()
-  const outputDir = clientOutputPath || (config.musicOutputPath as string) || join(homedir(), 'Music')
+  const outputDir = clientOutputPath || (config.musicOutputPath as string) || join(homedir(), 'Downloads')
   const browser = config.browserForCookies as string | undefined
 
   // For playlists, use playlist_index as track number in both filename and ID3 tag.
@@ -51,7 +51,14 @@ export default defineEventHandler(async (event) => {
   const jobId = randomUUID()
   const job = createJob(jobId)
 
-  const ytdlp = spawn('yt-dlp', args)
+  const ytdlp = spawn(getYtDlpExecutable(), args)
+  let finished = false
+
+  const finish = (exitCode: number) => {
+    if (finished) return
+    finished = true
+    finishJob(job, exitCode)
+  }
 
   const handleData = (data: Buffer) => {
     const lines = data.toString().split('\n').filter((l: string) => l.trim())
@@ -64,12 +71,12 @@ export default defineEventHandler(async (event) => {
   ytdlp.stderr.on('data', handleData)
 
   ytdlp.on('close', (code: number | null) => {
-    finishJob(job, code ?? 1)
+    finish(code ?? 1)
   })
 
-  ytdlp.on('error', (err: Error) => {
-    pushLine(job, `Error: ${err.message}`)
-    finishJob(job, 1)
+  ytdlp.on('error', (err: NodeJS.ErrnoException) => {
+    pushLine(job, getYtDlpSpawnError(err))
+    finish(1)
   })
 
   return { jobId }

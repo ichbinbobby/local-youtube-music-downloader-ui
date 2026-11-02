@@ -20,6 +20,15 @@ winget install yt-dlp.yt-dlp
 winget install Gyan.FFmpeg
 ```
 
+After installing, open a new terminal (and restart the app) so it picks up the updated PATH. Verify both tools are available:
+
+```powershell
+yt-dlp --version
+ffmpeg -version
+```
+
+If `yt-dlp` is installed but not on PATH, set `NUXT_YT_DLP_PATH` to the full path to its executable in `.env`.
+
 ## Setup
 
 Install dependencies:
@@ -42,10 +51,11 @@ Then open **http://localhost:3000** in your browser.
 
 1. Paste a YouTube or YouTube Music URL (single track or full playlist/album)
 2. Click **Get Info** to preview the metadata before downloading
-3. Optionally set a custom **output folder** — defaults to `~/Music`
+3. Optionally set a custom **output folder** — defaults to `~/Downloads`
 4. Click **Download** and watch the progress terminal
 
 Downloaded files are saved directly to disk under:
+
 ```
 <output folder>\<Album>\<track_number> - <title>.mp3
 ```
@@ -54,16 +64,21 @@ Downloaded files are saved directly to disk under:
 
 Copy `.env` and adjust as needed:
 
-| Variable | Description |
-|---|---|
-| `NUXT_MUSIC_OUTPUT_PATH` | Full path to your Music folder. Defaults to `~/Music` if empty. |
+| Variable                   | Description                                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `NUXT_MUSIC_OUTPUT_PATH`   | Custom download folder. Defaults to `~/Downloads` if empty.                                                 |
 | `NUXT_BROWSER_FOR_COOKIES` | Browser to pull cookies from (`chrome`, `edge`, `firefox`). Helps avoid rate limiting. Leave empty to skip. |
+| `NUXT_YT_DLP_PATH`         | Full path to the `yt-dlp` executable if it is not available on PATH.                                        |
 
 Example `.env`:
+
 ```
-NUXT_MUSIC_OUTPUT_PATH=C:\Users\YourName\Music
-NUXT_BROWSER_FOR_COOKIES=chrome
+NUXT_BROWSER_FOR_COOKIES=
+NUXT_YT_DLP_PATH=C:\path\to\yt-dlp.exe
 ```
+
+> [!TIP]
+> The yt-dlp install path may change after an update. If the configured path stops working, find the new `yt-dlp.exe` and update `NUXT_YT_DLP_PATH`.
 
 ## What gets embedded in each MP3
 
@@ -80,4 +95,4 @@ This metadata comes from YouTube's structured music block present on official Yo
 
 - **Local only** — designed to run on your own machine, not deployable to a server
 - Works best with YouTube Music links where full album/artist metadata is available
-- yt-dlp and ffmpeg must be on PATH; the app does not install them
+- yt-dlp and ffmpeg must be installed; ffmpeg must be on PATH. yt-dlp can be set with `NUXT_YT_DLP_PATH` if it is not on PATH.

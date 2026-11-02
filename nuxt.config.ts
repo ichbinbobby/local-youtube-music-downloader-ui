@@ -13,7 +13,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     musicOutputPath: '',
-    browserForCookies: ''
+    browserForCookies: '',
+    ytDlpPath: ''
   },
 
   compatibilityDate: '2025-01-15',
